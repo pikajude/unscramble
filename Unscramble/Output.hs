@@ -16,14 +16,14 @@ display :: [(Score, String, [Coordinate])]
         -> ScrambleOpts
         -> IO ()
 display xs g m (ScrambleOpts _ _ ds)
-     | ds == OneLine = (showTotal >>) $ mapM_ (\x -> putStr ((_2 ^$ x) ++ " ")) xs
+     | ds == OneLine = (showTotal >>) $ mapM_ (\x -> putStr ((view _2 x) ++ " ")) xs
      | ds == Chunked = (showTotal >>) $ mapM_ (\ns -> do
          mapM_ (displayGrid g m) ns
          putStrLn "\nPress enter for more, or ctrl-c to quit."
          getLine) $ chunk xs
     where
         showTotal = do
-            let points = sum . map (_1 ^$) $ xs
+            let points = sum . map (view _1) $ xs
             printf "%d total words for %d points.\n" (length xs) points
         chunk (a:b:c:es) = [a,b,c]:chunk es
         chunk x = [x]

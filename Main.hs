@@ -1,4 +1,4 @@
-import Control.Lens hiding ((&), value)
+import Control.Lens hiding ((&))
 import Data.List
 import Data.Maybe
 import Data.Ord
@@ -44,7 +44,7 @@ main = do
     filepath <- getDataFileName "lists/enable.txt"
     withFile filepath ReadMode $ \h -> do
         cont <- hGetContents h
-        let foundWords = sortBy ((invert .) . comparing (_1 ^$))
+        let foundWords = sortBy ((invert .) . comparing (view _1))
                        . mapMaybe (\a ->
                            searchGrid a grid' mult' (scoreSystem sopts))
                        $ lines cont
