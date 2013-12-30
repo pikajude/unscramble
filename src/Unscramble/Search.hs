@@ -19,8 +19,10 @@ search :: Search
        -> String
        -> Maybe (Score, String, [Coordinate])
 
-search s@(grid,_) system word = putWordIn $ walk firstPaths tokens
+search s@(grid,_) system word = putWordIn . reversePath . chooseBestPath $
+                                  walk firstPaths tokens
   where putWordIn             = fmap $ \(a, b) -> (a, word, b)
+        reversePath           = fmap $ \(score, path) -> (score, reverse path)
         (firstToken : tokens) = tokenize word
         lets                  = letters grid
         firstTokenPositions   = H.lookupDefault [] firstToken lets
@@ -35,11 +37,10 @@ search s@(grid,_) system word = putWordIn $ walk firstPaths tokens
         -- new and improved algorithm written by Devyn Cairns
         -- <devyn.cairns@gmail.com>
         -- thanks buddy
-        walk :: [[Coordinate]] -> [String] -> Maybe (Score, [Coordinate])
+        walk :: [[Coordinate]] -> [String] -> [[Coordinate]]
 
-        walk [] _     = Nothing
-        walk paths [] = fmap (\(score, path) -> (score, reverse path)) $
-                          chooseBestPath paths
+        walk [] _     = []
+        walk paths [] = paths
         walk paths (token : remaining) =
           let tokenPositions = H.lookupDefault [] token lets
               branch path =
