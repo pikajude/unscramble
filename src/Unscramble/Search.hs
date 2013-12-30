@@ -38,7 +38,8 @@ search s@(grid,_) system word = putWordIn $ walk firstPaths tokens
         walk :: [[Coordinate]] -> [String] -> Maybe (Score, [Coordinate])
 
         walk [] _     = Nothing
-        walk paths [] = chooseBestPath (map reverse paths)
+        walk paths [] = fmap (\(score, path) -> (score, reverse path)) $
+                          chooseBestPath paths
         walk paths (token : remaining) =
           let tokenPositions = H.lookupDefault [] token lets
               branch path =
