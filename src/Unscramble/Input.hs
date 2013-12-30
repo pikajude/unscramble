@@ -4,10 +4,10 @@ module Unscramble.Input (
 ) where
 
 import Control.Applicative
-import Control.Arrow
-import Control.Lens
+import Control.Monad
+import Data.Array
 import Data.Char
-import qualified Data.HashMap as H
+import qualified Data.HashMap.Strict as H
 import Data.List
 import Data.Maybe
 import System.IO
@@ -47,17 +47,15 @@ readGrid n = do
     _ <- printf "Enter a %dx%d grid. Remember:\n\
         \- Input only letters and press enter after each line.\n\
         \- You may enter a 'qu' tile as 'qu'.\n" n n
-    lines' <- sequence $ replicate n (filter isLetter <$> getLine)
+    lines' <- replicateM n (filter isLetter <$> getLine)
     putStrLn "Received grid."
-    return $ parseGrid lines'
+    return $ arraign lines'
 
-parseGrid :: [String] -> Grid
-parseGrid input = uncurry Grid
-                . (letterMap &&& coordMap)
-                . itoListOf (ifolded <.> ifolded)
-                $ map tokenize input
-    where
-        letterMap [] = H.empty
-        letterMap (((x,y),str):xs) = H.insertWith (++) str [(x,y)] $! letterMap xs
-        coordMap = foldr (uncurry H.insert) H.empty
-        tokenize = groupBy (\x y -> [x,y] == "qu")
+arraign :: [String] -> Grid
+arraign grid = Grid (hash ar) ar
+  where ar = array ((0,0),(len,len)) . redist . zip [0..]
+           $ map (zip [0..] . groupBy (\x y -> [x,y] == "qu")) grid
+        hash a = foldr (\(i,k) h -> H.insertWith (flip (++)) k [i] h) H.empty (assocs a)
+        len = pred . length $ head grid
+        redist ((x,ys):xs) = map (\(a,b) -> ((a,x),b)) ys ++ redist xs
+        redist [] = []

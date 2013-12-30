@@ -3,18 +3,17 @@ module Unscramble.Score (
     score
 ) where
 
-import Control.Lens
-import qualified Data.HashMap as H
+import Data.Array ((!))
 import Data.Maybe
 import Unscramble.Types
 
-score :: ScoringSystem -> [Coordinate] -> Search Int
-score Boggle = scoreBoggle
-score SWF = scoreSWF
-score WordWars = scoreWordWars
+score :: ScoringSystem -> Search -> [Coordinate] -> Int
+score Boggle _ = scoreBoggle
+score SWF s = scoreSWF s
+score WordWars s = scoreWordWars s
 
-scoreBoggle :: [Coordinate] -> Search Int
-scoreBoggle xs = return $ case length xs of
+scoreBoggle :: [Coordinate] -> Int
+scoreBoggle xs = case length xs of
     3 -> 1
     4 -> 1
     5 -> 2
@@ -23,12 +22,10 @@ scoreBoggle xs = return $ case length xs of
     x | x >= 8 -> 11
     _ -> 0
 
-scoreWordWars :: [Coordinate] -> Search Int
-scoreWordWars xs = do
-    g <- view (grid.coords)
-    let lets = map (\x -> H.findWithDefault undefined x g) xs
-    return . sum . map (\x -> fromMaybe 0 $ lookup x scores) $ lets
+scoreWordWars :: Search -> [Coordinate] -> Int
+scoreWordWars (Grid _ cs,_) xs = sum . map (\x -> fromMaybe 0 $ lookup x scores) $ lets
     where
+        lets = map (cs !) xs
         scores = [ ("a", 1), ("b", 4), ("c", 3), ("d", 2)
                  , ("e", 1), ("f", 2), ("g", 3), ("h", 3)
                  , ("i", 1), ("j", 6), ("k", 5), ("l", 2)
@@ -36,26 +33,23 @@ scoreWordWars xs = do
                  , ("qu", 8), ("r", 1), ("s", 1), ("t", 1)
                  , ("u", 3), ("v", 4), ("w", 4), ("x", 8)
                  , ("y", 2), ("z", 8) ]
-        
-scoreSWF :: [Coordinate] -> Search Int
-scoreSWF cs = if length cs == 2
-    then return 1
-    else do
-        (Multiplier dl dw tl tw) <- view mult
-        (Grid _ gs) <- view grid
-        let dwm = case dw of
+
+scoreSWF :: Search -> [Coordinate] -> Int
+scoreSWF (Grid _ gs, Multiplier dl dw tl tw) cs = if length cs == 2
+    then 1
+    else let dwm = case dw of
                       Nothing -> id
                       Just r -> if r `elem` cs then (*2) else id
-            twm = case tw of
-                      Nothing -> id
-                      Just r -> if r `elem` cs then (*3) else id
-            scoreOf n = dlm . tlm $ baseScore n
-                where
-                    baseScore q = fromJust $ H.lookup q gs >>= (`lookup` scores)
-                    dlm = if n `elem` dl then (*2) else id
-                    tlm = if n `elem` tl then (*3) else id
-                    
-        return . (+ lengthBonus (length cs)) . dwm . twm . sum
+             twm = case tw of
+                       Nothing -> id
+                       Just r -> if r `elem` cs then (*3) else id
+             scoreOf n = dlm . tlm $ baseScore n
+                 where
+                     baseScore q = fromJust $ lookup (gs ! q) scores
+                     dlm = if n `elem` dl then (*2) else id
+                     tlm = if n `elem` tl then (*3) else id
+
+         in (+ lengthBonus (length cs)) . dwm . twm . sum
                $ map scoreOf cs
     where
         scores = [ ("a", 1), ("b", 4), ("c", 4), ("d", 2)
