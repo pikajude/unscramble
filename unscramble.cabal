@@ -4,6 +4,7 @@ synopsis:       Solve Boggle-like word games
 version:        1.0
 description:    Solve Boggle-like word games
 license:        MIT
+license-file:   LICENSE
 author:         Joel Taylor, Devyn Cairns
 maintainer:     Joel Taylor <me@joelt.io>,
                 Devyn Cairns <devyn.cairns@gmail.com>
@@ -26,3 +27,7 @@ executable unscramble
                     , unordered-containers
   default-extensions: TemplateHaskell, TupleSections
   default-language:   Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/joelteon/unscramble.git
