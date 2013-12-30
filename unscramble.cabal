@@ -16,7 +16,6 @@ executable unscramble
   hs-source-dirs:         src
   build-depends:          base == 4.*
                         , array
-                        , lens
                         , optparse-applicative
                         , stream-fusion
                         , unordered-containers

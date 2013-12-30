@@ -2,7 +2,6 @@ module Unscramble.Output (
     display
 ) where
 
-import Control.Lens
 import Data.Array
 import Text.Printf
 import Unscramble.Types
@@ -21,7 +20,7 @@ display xs g m (ScrambleOpts _ _ ds)
          getLine) $ chunk xs
     where
         showTotal = do
-            let points = sum . map (view _1) $ xs
+            let points = sum . map (\(a,_,_) -> a) $ xs
             printf "%d total words for %d points.\n" (length xs) points
         chunk (a:b:c:es) = [a,b,c]:chunk es
         chunk x = [x]
