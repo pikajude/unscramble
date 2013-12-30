@@ -2,8 +2,9 @@ import Data.List
 import Data.Maybe
 import Data.Ord
 import Options.Applicative
-import Paths_unscramble
 import System.IO
+import Unscramble.Download
+import Unscramble.Lists
 import Unscramble.Input
 import Unscramble.Output
 import Unscramble.Score
@@ -36,11 +37,12 @@ parseOpts = ScrambleOpts
 main :: IO ()
 main = do
     sopts <- execParser opts
+    fetch
     grid' <- readGrid (gridSize sopts)
     mult' <- case scoreSystem sopts of
         SWF -> readMult
         _ -> return $ Multiplier [] Nothing [] Nothing
-    filepath <- getDataFileName "lists/enable.txt"
+    filepath <- listPath "enable"
     withFile filepath ReadMode $ \h -> do
         cont <- hGetContents h
         let foundWords = sortBy ((invert .) . comparing (\(a,_,_) -> a))

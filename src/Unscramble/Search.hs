@@ -2,6 +2,7 @@
 
 module Unscramble.Search (search) where
 
+import Control.Arrow
 import Control.Monad
 import qualified Data.HashMap.Strict as H
 import Data.List.Stream
@@ -22,7 +23,7 @@ search :: Search
 search s@(grid,_) system word = putWordIn . reversePath . chooseBestPath $
                                   walk firstPaths tokens
   where putWordIn             = fmap $ \(a, b) -> (a, word, b)
-        reversePath           = fmap $ \(score, path) -> (score, reverse path)
+        reversePath           = fmap (second reverse)
         (firstToken : tokens) = tokenize word
         lets                  = letters grid
         firstTokenPositions   = H.lookupDefault [] firstToken lets
