@@ -7,7 +7,7 @@ import qualified Data.HashMap.Strict as H
 import Data.List.Stream
 import Data.Maybe
 import Data.Ord
-import Prelude hiding (map, filter, head, concatMap)
+import Prelude hiding (map, filter, reverse, head, concatMap)
 import Unscramble.Score
 import Unscramble.Types
 
@@ -38,7 +38,7 @@ search s@(grid,_) system word = putWordIn $ walk firstPaths tokens
         walk :: [[Coordinate]] -> [String] -> Maybe (Score, [Coordinate])
 
         walk [] _     = Nothing
-        walk paths [] = chooseBestPath paths
+        walk paths [] = chooseBestPath (map reverse paths)
         walk paths (token : remaining) =
           let tokenPositions = H.lookupDefault [] token lets
               branch path =
