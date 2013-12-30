@@ -1,31 +1,23 @@
 module Unscramble.Types (
     ScrambleOpts(..),
-    
+
     Coordinate,
     Multiplier(..),
     Grid(..),
-    letters,
-    coords,
-    
-    grid,
-    mult,
-    ss,
-    start,
-    valid,
-    
+    Search,
+
     ScoringSystem(..),
     Score,
-    
-    DisplayStyle(..),
-    
-    Search
+
+    DisplayStyle(..)
 ) where
 
-import Control.Lens
-import Control.Monad.RWS
+import Data.Array
 import Data.Char
-import qualified Data.HashMap as H
+import qualified Data.HashMap.Strict as H
 import Data.List
+
+type Tile = String
 
 data ScrambleOpts = ScrambleOpts { gridSize :: Int
                                  , scoreSystem :: ScoringSystem
@@ -67,21 +59,8 @@ data Multiplier = Multiplier { doubleLetter :: [Coordinate]
                              , tripleWord   :: Maybe Coordinate
                              }
 
-data Grid = Grid { _letters :: H.Map String [Coordinate]
-                 , _coords :: H.Map Coordinate String
+data Grid = Grid { letters :: H.HashMap Tile [Coordinate]
+                 , coords :: Array (Int,Int) Tile
                  }
-                 
-makeLenses ''Grid
 
-type Search = RWS (Grid, Multiplier, ScoringSystem) () ([Coordinate], [[Coordinate]])
-
-grid :: Simple Lens (Grid, Multiplier, ScoringSystem) Grid
-grid = _1
-mult :: Simple Lens (Grid, Multiplier, ScoringSystem) Multiplier
-mult = _2
-ss :: Simple Lens (Grid, Multiplier, ScoringSystem) (ScoringSystem)
-ss = _3
-start :: Simple Lens ([Coordinate], [[Coordinate]]) [Coordinate]
-start = _1
-valid :: Simple Lens ([Coordinate], [[Coordinate]]) [[Coordinate]]
-valid = _2
+type Search = (Grid, Multiplier)
