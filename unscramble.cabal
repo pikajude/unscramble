@@ -1,24 +1,28 @@
 name:           unscramble
-category:       Utils
+category:       Text
 synopsis:       Solve Boggle-like word games
-version:        0.4
+version:        1.0
 description:    Solve Boggle-like word games
-license:        GPL
-author:         Joel Taylor
-maintainer:     barebonesgraphics@gmail.com
+license:        MIT
+author:         Joel Taylor, Devyn Cairns
+maintainer:     Joel Taylor <me@joelt.io>,
+                Devyn Cairns <devyn.cairns@gmail.com>
 build-type:     Simple
 cabal-version:  >=1.10
 data-files:     lists/enable.txt
 
 executable unscramble
-  main-is:                Main.hs
-  other-modules:          Unscramble.Input, Unscramble.Output, Unscramble.Score, Unscramble.Search, Unscramble.Types
-  hs-source-dirs:         src
-  build-depends:          base == 4.*
-                        , array
-                        , optparse-applicative
-                        , stream-fusion
-                        , unordered-containers
-  default-extensions:     TemplateHaskell, TupleSections
-  default-language:       Haskell2010
-  ghc-options: -auto-all -caf-all
+  main-is:            Main.hs
+  other-modules:      Unscramble.Input
+                    , Unscramble.Output
+                    , Unscramble.Score
+                    , Unscramble.Search
+                    , Unscramble.Types
+  hs-source-dirs:     src
+  build-depends:      base == 4.*
+                    , array
+                    , optparse-applicative
+                    , stream-fusion
+                    , unordered-containers
+  default-extensions: TemplateHaskell, TupleSections
+  default-language:   Haskell2010
